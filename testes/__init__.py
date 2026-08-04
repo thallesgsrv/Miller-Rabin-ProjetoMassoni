@@ -1,0 +1,2 @@
+from .testes_carmichael import executar_teste_carmichael
+from .comparacao import executar_comparacao

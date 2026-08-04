@@ -7,7 +7,7 @@ from sympy import isprime
 DIRETORIO_BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(os.path.join(DIRETORIO_BASE, 'algoritmo'))
 
-from miller_rabin import miller_rabin
+from algoritmo import miller_rabin
 
 # Realizando testes de estresse do algoritmo Miller-Rabin.
 # O objetivo é comparar a performance do algoritmo com a 

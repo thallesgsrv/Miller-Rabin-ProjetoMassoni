@@ -1,7 +1,7 @@
 import random
 
-from algoritmo.decomposicao import decomposicao
-from algoritmo.testemunha import testemunha
+from algoritmo import decomposicao
+from algoritmo import testemunha
 
 PRIMOS = [
     2, 3, 5, 7, 11, 13, 17, 19,

@@ -1,226 +1,82 @@
-# 🔐 Teste de Primalidade de Miller-Rabin
+# Teste de Primalidade de Miller-Rabin
 
-Projeto desenvolvido para a disciplina de **Fundamentos de Matemática para Ciência da Computação II (FMCC2)**.
+Trabalho da disciplina de Fundamentos de Matemática para Ciência da Computação II (FMCC2), sobre o algoritmo de Miller-Rabin para verificar se um número é primo.
 
-O objetivo do projeto é implementar e analisar o **Teste de Miller-Rabin**, um algoritmo probabilístico utilizado para verificar se um número inteiro é primo.
+## O que é o algoritmo
 
----
+O Miller-Rabin é um teste probabilístico de primalidade: em vez de testar todos os divisores possíveis até a raiz de `n` (o que fica inviável para números grandes), ele usa aritmética modular para decidir, com alta probabilidade, se `n` é primo ou composto.
 
-# 📚 Introdução
+A ideia parte do Pequeno Teorema de Fermat: se `n` é primo e `a` é coprimo com `n`, então `a^(n-1) ≡ 1 (mod n)`. O Miller-Rabin refina isso escrevendo `n - 1 = 2^s * d`, com `d` ímpar, e testando se, para uma base `a`:
 
-O **Teste de Miller-Rabin**, desenvolvido pelos matemáticos **Gary Miller** e **Michael Rabin**, é um dos algoritmos mais eficientes para testar a primalidade de números inteiros muito grandes.
+- `a^d ≡ 1 (mod n)`, ou
+- `a^(2^r * d) ≡ -1 (mod n)` para algum `0 ≤ r < s`
 
-Diferentemente dos testes determinísticos tradicionais, como a divisão por todos os possíveis divisores até √n, o Miller-Rabin utiliza propriedades da aritmética modular para realizar a verificação de maneira eficiente.
+Se nenhuma das duas condições vale, `a` é uma testemunha de que `n` é composto. Como o teste pode errar (classificar um composto como primo) com probabilidade no máximo 1/4 por rodada, repetimos com várias bases diferentes para reduzir esse erro exponencialmente — com 10 rodadas, por exemplo, a chance de erro cai para cerca de 1 em 1 milhão.
 
-O algoritmo é amplamente utilizado em aplicações de criptografia, como o processo de geração de chaves no sistema RSA.
+Esse é o teste usado na prática para gerar os primos grandes usados em RSA e outros esquemas de chave pública, já que testar primalidade por divisão direta seria lento demais nesses tamanhos.
 
----
+## Estrutura do projeto
 
-# 🔎 Confiabilidade do Teste
-
-O Miller-Rabin é um teste **probabilístico**, pois existe uma pequena possibilidade de classificar incorretamente um número composto como primo.
-
-Para um número composto `n`, a probabilidade de uma única rodada do teste retornar um resultado incorreto é limitada por:
-
-$$
-P(\text{erro}) \leq \frac{1}{4}
-$$
-
-Ao realizar o teste utilizando diferentes bases (testemunhas), a probabilidade de erro diminui exponencialmente:
-
-$$
-P(\text{erro após } k \text{ rodadas}) \leq \left(\frac{1}{4}\right)^k
-$$
-
-Assim, aumentando o número de rodadas, a chance de erro torna-se extremamente pequena.
-
-Exemplo:
-
-**5 rodadas:**
-
-$$
-\left(\frac{1}{4}\right)^5 = \frac{1}{1024}
-$$
-
-**10 rodadas:**
-
-$$
-\left(\frac{1}{4}\right)^{10} = \frac{1}{1048576}
-$$
-
----
-
-# 🧮 Fundamentação Matemática
-
-O funcionamento do Miller-Rabin é baseado em propriedades dos números primos e da aritmética modular.
-
-Pelo **Pequeno Teorema de Fermat**, se `n` é primo e `a` é um inteiro coprimo com `n`, então:
-
-$$
-a^{n-1} \equiv 1 \pmod n
-$$
-
-O Miller-Rabin aprimora essa ideia escrevendo:
-
-$$
-n-1 = 2^s \cdot d
-$$
-
-onde:
-
-* `s` é um inteiro não negativo;
-* `d` é um número ímpar.
-
-A partir disso, para uma base `a`, o número `n` é considerado provavelmente primo se uma das condições for satisfeita:
-
-$$
-a^d \equiv 1 \pmod n
-$$
-
-ou
-
-$$
-a^{2^r d} \equiv -1 \pmod n
-$$
-
-para algum:
-
-$$
-0 \leq r < s
-$$
-
-Caso nenhuma dessas condições seja satisfeita, `a` é considerada uma **testemunha de composição**, indicando que:
-
-$$
-n \text{ é composto}
-$$
-
----
-
-# ⚙️ Funcionamento do Algoritmo
-
-O algoritmo segue os seguintes passos:
-
-1. Recebe um número inteiro `n`.
-2. Escreve `n - 1` na forma
-
-$$
-n - 1 = 2^s \cdot d
-$$
-
-3. Escolhe uma base aleatória `a`.
-4. Calcula
-
-$$
-x = a^d \bmod n
-$$
-
-5. Verifica se:
-
-   * `x = 1`; ou
-   * algum valor sucessivo de `x² mod n` é igual a `n - 1`.
-
-6. Repete o processo por `k` rodadas para aumentar a confiabilidade.
-
----
-
-# ▶️ Instruções de Uso
-
-## Pré-requisitos
-
-* Python 3.10 ou superior;
-* Biblioteca `sympy`.
-
-Instale a dependência com:
-
-```bash
-pip install sympy
+```
+.
+├── algoritmo
+│   ├── decomposicao.py       # escreve n-1 como 2^s * d
+│   ├── miller_rabin.py       # teste principal
+│   ├── testemunha.py         # verifica se uma base é testemunha de composição
+│   └── main_miller_rabin.py
+├── testes
+│   ├── testes_basicos.py
+│   ├── testes_carmichael.py  # casos difíceis (números de Carmichael)
+│   ├── testes_de_estresse.py
+│   └── comparacao.py
+├── graficos
+│   ├── desempenho.py         # tempo x tamanho do número
+│   ├── comparacao.py         # Miller-Rabin x método ingênuo
+│   └── erro.py               # taxa de erro observada
+├── utils/                    # imagens dos gráficos gerados
+├── main.py
+└── requirements.txt
 ```
 
-## Executando o programa
+## Como rodar
 
-Na raiz do projeto, execute:
+Requisitos: Python 3.10+, `sympy` e `matplotlib`.
 
 ```bash
+pip install -r requirements.txt
 python main.py
 ```
 
-Ao iniciar, será exibido um menu com as seguintes opções:
+O `main.py` abre um menu:
 
-| Opção | Descrição                                                              |
-| :---: | ---------------------------------------------------------------------- |
-| **1** | Testar um número utilizando o algoritmo de Miller-Rabin.               |
-| **2** | Gerar o gráfico de desempenho (bits × tempo).                          |
-| **3** | Gerar o gráfico da taxa de erro utilizando números de Carmichael.      |
-| **4** | Gerar o gráfico de comparação entre o Miller-Rabin e o método ingênuo. |
-| **5** | Executar todos os gráficos do projeto.                                 |
-| **6** | Executar todos os testes implementados.                                |
-| **0** | Encerrar o programa.                                                   |
-
-Basta digitar a opção desejada e pressionar **Enter**.
-
-## Estrutura do Projeto
-
-```text
-.
-├── algoritmo
-│   ├── decomposicao.py
-│   ├── main_miller_rabin.py
-│   ├── miller_rabin.py
-│   └── testemunha.py
-│
-├── graficos
-│   ├── comparacao.py
-│   ├── desempenho.py
-│   └── erro.py
-│
-├── testes
-│   ├── comparacao.py
-│   ├── testes_basicos.py
-│   ├── testes_carmichael.py
-│   └── testes_de_estresse.py
-│
-├── main.py
-└── README.md
+```
+1 - Testar um número com Miller-Rabin
+2 - Gráfico de desempenho (bits x tempo)
+3 - Gráfico de taxa de erro (números de Carmichael)
+4 - Comparação com o método ingênuo
+5 - Rodar todos os gráficos
+6 - Rodar todos os testes
+0 - Sair
 ```
 
----
+## Resultados
 
-# 🚀 Complexidade
+**Desempenho.** Medimos o tempo médio de execução para números de diferentes tamanhos (em bits). O crescimento observado acompanha a complexidade teórica de `O(k log n)` por rodada.
 
-O custo do algoritmo depende da quantidade de rodadas realizadas.
+![Gráfico de desempenho](utils/desempenho.png)
 
-Para cada rodada são realizadas operações de exponenciação modular, cuja complexidade é
+**Miller-Rabin vs. método ingênuo.** Comparamos com a abordagem de testar divisores até `√n`. A diferença fica evidente à medida que o número de bits cresce — o método ingênuo se torna rapidamente inviável, enquanto o Miller-Rabin continua rápido.
 
-$$
-O(\log n)
-$$
+![Comparação](utils/comparacao.png)
 
-Assim, considerando `k` rodadas, a complexidade total é
+**Taxa de erro com números de Carmichael.** Números de Carmichael são compostos que passam no teste de Fermat para quase todas as bases, então são um bom caso de teste para ver se o Miller-Rabin realmente detecta a composição. Rodamos o teste com diferentes quantidades de rodadas e medimos a taxa de falsos positivos.
 
-$$
-O(k \log n)
-$$
+![Taxa de erro](utils/taxa_erro.png)
 
-Como normalmente `k` é um valor pequeno, o algoritmo consegue testar números com centenas ou milhares de bits de maneira eficiente.
+## Integrantes
 
----
-
-# 📌 Aplicações
-
-O teste de Miller-Rabin possui diversas aplicações, principalmente em:
-
-* 🔑 Geração de chaves criptográficas (RSA);
-* 🔐 Sistemas de segurança digital;
-* 📡 Protocolos de comunicação segura;
-* 🔢 Verificação de grandes números primos.
-
----
-
-# 👥 Integrantes
-
-* Thalles Gabriel Saraiva de Lira Silva
-* João Raphannely Medeiros Silva
-* Hilbert Machado Gomes
-* Mateus Soares da Rocha Cordeiro
-* Eva Braga Santos
+- Thalles Gabriel Saraiva de Lira Silva
+- João Raphannely Medeiros Silva
+- Hilbert Machado Gomes
+- Mateus Soares da Rocha Cordeiro
+- Eva Braga Santos
